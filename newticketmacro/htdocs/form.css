@@ -1,0 +1,10 @@
+form.newticketmacro_form input[type='text'] {
+  width: 90%;
+  display: block;
+}
+form.newticketmacro_form textarea {
+  width: 92%; 
+}
+form.newticketmacro_form input[type='submit'] {
+  display: block;
+}

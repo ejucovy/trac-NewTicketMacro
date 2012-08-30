@@ -1,0 +1,108 @@
+<html xmlns:py="http://genshi.edgewall.org/" py:strip="">
+<div class="newticketmacro_form_container ${container_class}">
+  <py:choose>
+    <py:when test="heading is not None">
+      <h2>${heading}</h2>
+    </py:when>
+  </py:choose>
+  <py:choose>
+    <py:when test="subheading is not None">
+      <div class="subheading">${subheading}</div>
+    </py:when>
+  </py:choose>
+ <py:choose>
+  <py:when test="'TICKET_CREATE' in req.perm">
+    <form method="POST" action="${req.href.newticket()}" 
+	  class="newticketmacro_form" id="${form}">
+      <input type="hidden" name="__FORM_TOKEN" value="${req.form_token}" />
+      <input type="text" id="field-summary" name="field_summary" 
+	     placeholder="${summary_placeholder}" />
+      <textarea id="field-description" name="field_description" 
+		rows="${description_rows}"
+		placeholder="${summary_description}"></textarea>
+      <py:for each="field in form_fields">
+
+        <py:choose test="field.type" py:if="field">
+
+	  <div py:when="'select'">
+	    <label for="field-${field.name}">
+	      ${field.placeholder}:
+              <select id="field-${field.name}" name="field_${field.name}">
+		<option py:if="field.optional"></option>
+		<option py:for="option in field.options"
+			selected="${value == option or None}"
+			value="$option" py:content="option"></option>
+		<optgroup py:for="optgroup in field.optgroups"
+			  py:if="optgroup.options"
+			  label="${optgroup.label}">
+		  <option py:for="option in optgroup.options"
+			  selected="${value == option or None}"
+			  value="$option" py:content="option"></option>
+		</optgroup>
+              </select>
+	    </label>
+	  </div>
+	  
+          <textarea py:when="'textarea'" id="field-${field.name}" name="field_${field.name}"
+                    cols="${field.width}" rows="${field.height}"
+		    placeholder="${field.placeholder}"
+                    class="${'wikitext ' if field.format == 'wiki' else None}trac-resizable">
+	    ${value}</textarea>
+
+          <span py:when="'checkbox'">
+            <input type="checkbox" id="field-${field.name}" name="field_${field.name}"
+                   checked="${value == '1' or None}" value="1" />
+            <input type="hidden" name="field_checkbox_${field.name}" value="1" />
+          </span>
+
+          <label py:when="'radio'"
+                 py:for="idx, option in enumerate(field.options)">
+            <input type="radio" name="field_${field.name}" value="${option}"
+                   checked="${value == option or None}" />
+            ${option}
+          </label>
+
+          <py:otherwise><!--! Text input fields -->
+            <py:choose>
+              <span py:when="field.cc_entry"><!--! Special case for Cc: field -->
+                <em>${field.cc_entry}</em>
+                <input type="checkbox" id="field-cc" name="cc_update"
+                       title="This checkbox allows you to add or remove yourself from the CC list."
+		       placeholder="${field.placeholder}"
+                       checked="${field.cc_update}" />
+              </span>
+              <!--! Cc: when TICKET_EDIT_CC is allowed -->
+              <span py:when="field.name == 'cc'">
+                <input  type="text" id="field-${field.name}"
+                        title="Space or comma delimited email addresses and usernames are accepted."
+			placeholder="${field.placeholder}"
+                        name="field_${field.name}" value="${value}" />
+              </span>
+              <!--! All the other text input fields -->
+              <input py:otherwise="" type="text" id="field-${field.name}"
+		     placeholder="${field.placeholder}"
+                     name="field_${field.name}" value="${value}" />
+            </py:choose>
+          </py:otherwise>
+        </py:choose>
+	
+      </py:for>
+
+      <input type="submit" />
+    </form>
+  </py:when>
+  <py:otherwise>
+    <py:choose>
+      <py:when test="req.session.authenticated">
+	<b>You do not have permissions to create a new ticket, sorry.</b>
+      </py:when>
+      <py:otherwise>
+	<b>To file a ticket, you'll need to
+	  <a href="${req.href.login()}">log in</a> or
+	  <a href="${req.href.register()}">create an account</a>.</b>
+      </py:otherwise>
+    </py:choose>
+  </py:otherwise>
+ </py:choose>
+</div>
+</html>
