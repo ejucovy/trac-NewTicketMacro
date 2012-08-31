@@ -20,6 +20,10 @@
       <textarea id="field-description" name="field_description" 
 		rows="${description_rows}"
 		placeholder="${summary_description}"></textarea>
+      <py:for each="field, value in hidden_fields">
+	<input type="hidden" name="${field}" value="${value}" />
+      </py:for>
+
       <py:for each="field in form_fields">
 
         <py:choose test="field.type" py:if="field">

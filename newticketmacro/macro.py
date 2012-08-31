@@ -31,6 +31,7 @@ class NewTicketMacro(WikiMacroBase):
         ('container_class', ''),
         ('description_rows', '5'),
         ('form_fields', ''),
+        ('hidden_fields', ''),
         )
 
     def expand_macro(self, formatter, name, content, args):
@@ -44,6 +45,8 @@ class NewTicketMacro(WikiMacroBase):
             data.setdefault(default[0], default[1])
         data['form_fields'] = [i.strip() for i in data['form_fields'].split()
                                if i.strip()]
+        data['hidden_fields'] = [i.strip() for i in data['hidden_fields'].split()
+                                 if i.strip()]
         
         _form_fields = []
         if len(data['form_fields']):
@@ -57,6 +60,9 @@ class NewTicketMacro(WikiMacroBase):
                     TicketSystem(self.env).eventually_restrict_owner(fields[field])
                 _form_fields.append(fields[field])
         data['form_fields'] = _form_fields
+
+        if len(data['hidden_fields']):
+            data['hidden_fields'] = [i.split("=") for i in data['hidden_fields']]
 
         self.log.debug("EXPAND ARGUMENTS: %s " % data)
         req = formatter.req
