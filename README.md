@@ -1,4 +1,4 @@
-trac-NewPageMacro
+trac-NewTicketMacro
 =================
 
 A little macro you can insert into your wiki pages which will let users create a new ticket.
